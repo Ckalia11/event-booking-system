@@ -2,6 +2,8 @@ const bcrypt = require('bcrypt');
 
 const Event = require('../../models/event');
 const User = require('../../models/user');
+const Booking = require('../../models/booking');
+const event = require('../../models/event');
 
 const user = (userID) => {
   return User.findById(userID)
@@ -9,7 +11,7 @@ const user = (userID) => {
       return {
         ...user._doc,
         password: null,
-        createdEvents: events.bind(this, user._doc.createdEvents),
+        createdEvents: events.bind(this, user.createdEvents),
       };
     })
     .catch((err) => {
@@ -23,10 +25,24 @@ const events = (eventsIDs) => {
       return events.map((event) => {
         return {
           ...event._doc,
-          date: new Date(event._doc.date).toISOString(),
+          date: new Date(event.date).toISOString(),
           creator: user.bind(this, event.creator),
         };
       });
+    })
+    .catch((err) => {
+      throw err;
+    });
+};
+
+const singleEvent = (eventID) => {
+  return Event.findById(eventID)
+    .then((event) => {
+      return {
+        ...event._doc,
+        date: new Date(event.date).toISOString(),
+        creator: user.bind(this, event.creator),
+      };
     })
     .catch((err) => {
       throw err;
@@ -40,8 +56,8 @@ module.exports = {
         return events.map((event) => {
           return {
             ...event._doc,
-            date: new Date(event._doc.date).toISOString(),
-            creator: user.bind(this, event._doc.creator),
+            date: new Date(event.date).toISOString(),
+            creator: user.bind(this, event.creator),
           };
         });
       })
@@ -49,8 +65,8 @@ module.exports = {
         throw err;
       });
   },
-  user: (userID) => {
-    return User.findById(userID.userID)
+  user: (args) => {
+    return User.findById(args.userID)
       .then((user) => {
         if (!user) {
           throw new Error('user not found');
@@ -58,8 +74,25 @@ module.exports = {
         return {
           ...user._doc,
           password: null,
-          createdEvents: events.bind(this, user._doc.createdEvents),
+          createdEvents: events.bind(this, user.createdEvents),
         };
+      })
+      .catch((err) => {
+        throw err;
+      });
+  },
+  bookings: () => {
+    return Booking.find()
+      .then((bookings) => {
+        return bookings.map((booking) => {
+          return {
+            ...booking._doc,
+            event: singleEvent.bind(this, booking.event),
+            user: user.bind(this, booking.user),
+            createdAt: new Date(booking.createdAt).toISOString(),
+            updatedAt: new Date(booking.updatedAt).toISOString(),
+          };
+        });
       })
       .catch((err) => {
         throw err;
@@ -79,8 +112,8 @@ module.exports = {
       .then((result) => {
         createdEvent = {
           ...result._doc,
-          date: new Date(event._doc.date).toISOString(),
-          creator: user.bind(this, result._doc.creator),
+          date: new Date(event.date).toISOString(),
+          creator: user.bind(this, result.creator),
         };
         return User.findById('64ed62397d304e11b87d68db');
       })
@@ -125,6 +158,48 @@ module.exports = {
       })
       .catch((err) => {
         console.log(err);
+        throw err;
+      });
+  },
+  bookEvent: (args) => {
+    return Event.findById(args.eventID)
+      .then((event) => {
+        if (!event) {
+          throw new Error('Event not found');
+        }
+        const booking = new Booking({
+          user: '64ed62397d304e11b87d68db',
+          event: event,
+        });
+        return booking.save();
+      })
+      .then((booking) => {
+        return {
+          ...booking._doc,
+          user: user.bind(this, booking.user),
+          event: singleEvent.bind(this, booking.event),
+          createdAt: new Date(booking.createdAt).toISOString(),
+          updatedAt: new Date(booking.updatedAt).toISOString(),
+        };
+      })
+      .catch((err) => {
+        throw err;
+      });
+  },
+  cancelBooking: (args) => {
+    return Booking.findByIdAndDelete(args.bookingID)
+      .populate('event')
+      .then((booking) => {
+        if (!booking) {
+          throw new Error('no booking found');
+        }
+        const event = {
+          ...booking.event._doc,
+          creator: user.bind(this, booking.event.creator),
+        };
+        return event;
+      })
+      .catch((err) => {
         throw err;
       });
   },
