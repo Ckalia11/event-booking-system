@@ -8,6 +8,7 @@ const user = (userID) => {
     .then((user) => {
       return {
         ...user._doc,
+        password: null,
         createdEvents: events.bind(this, user._doc.createdEvents),
       };
     })
@@ -48,13 +49,29 @@ module.exports = {
         throw err;
       });
   },
+  user: (userID) => {
+    return User.findById(userID.userID)
+      .then((user) => {
+        if (!user) {
+          throw new Error('user not found');
+        }
+        return {
+          ...user._doc,
+          password: null,
+          createdEvents: events.bind(this, user._doc.createdEvents),
+        };
+      })
+      .catch((err) => {
+        throw err;
+      });
+  },
   createEvent: (args) => {
     const event = new Event({
       title: args.eventInput.title,
       description: args.eventInput.description,
       price: +args.eventInput.price,
       date: new Date(args.eventInput.date),
-      creator: '64ebf62af06abf5d5483eb41',
+      creator: '64ed62397d304e11b87d68db',
     });
     let createdEvent;
     return event
@@ -65,7 +82,7 @@ module.exports = {
           date: new Date(event._doc.date).toISOString(),
           creator: user.bind(this, result._doc.creator),
         };
-        return User.findById('64ebf62af06abf5d5483eb41');
+        return User.findById('64ed62397d304e11b87d68db');
       })
       .then((user) => {
         if (!user) {

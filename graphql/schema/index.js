@@ -31,6 +31,7 @@ input UserInput {
 
 type RootQuery {
     events: [Event!]!
+    user(userID: String!): User!
 }
 
 type RootMutation {
