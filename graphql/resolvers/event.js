@@ -13,20 +13,23 @@ module.exports = {
         throw err;
       });
   },
-  createEvent: (args) => {
+  createEvent: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error('unauthenticated');
+    }
     const event = new Event({
       title: args.eventInput.title,
       description: args.eventInput.description,
       price: +args.eventInput.price,
       date: new Date(args.eventInput.date),
-      creator: '64ed62397d304e11b87d68db',
+      creator: req.userID,
     });
     let createdEvent;
     return event
       .save()
       .then((result) => {
         createdEvent = transformEvent(result);
-        return User.findById('64ed62397d304e11b87d68db');
+        return User.findById(req.userID);
       })
       .then((user) => {
         if (!user) {
