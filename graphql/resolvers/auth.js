@@ -2,14 +2,42 @@ const bcrypt = require('bcrypt');
 const User = require('../../models/user');
 const { transformUser } = require('./helpers');
 
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
 module.exports = {
   user: (args) => {
     return User.findById(args.userID)
       .then((user) => {
         if (!user) {
-          throw new Error('user not found');
+          throw new Error('User not found');
         }
         return transformUser(user);
+      })
+      .catch((err) => {
+        throw err;
+      });
+  },
+  login: ({ email, password }) => {
+    let user;
+    return User.findOne({ email: email })
+      .then((result) => {
+        if (!result) {
+          throw new Error('User not found');
+        }
+        user = result;
+        return bcrypt.compare(password, user.password);
+      })
+      .then((isEqual) => {
+        if (!isEqual) {
+          throw new Error('login information incorrect');
+        }
+        const token = jwt.sign(
+          { userID: user._id, email: user.email },
+          process.env.JWT_KEY,
+          { expiresIn: '1hr' }
+        );
+        return { userID: user._id, token: token, expiryHours: 1 };
       })
       .catch((err) => {
         throw err;

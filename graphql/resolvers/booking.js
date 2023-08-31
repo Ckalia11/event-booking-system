@@ -4,7 +4,10 @@ const Event = require('../../models/event');
 const { transformBooking, transformEvent } = require('./helpers');
 
 module.exports = {
-  bookings: () => {
+  bookings: (_, req) => {
+    if (!req.isAuth) {
+      throw new Error('unauthenticated');
+    }
     return Booking.find()
       .then((bookings) => {
         return bookings.map(transformBooking);
@@ -13,14 +16,17 @@ module.exports = {
         throw err;
       });
   },
-  bookEvent: (args) => {
+  bookEvent: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error('unauthenticated');
+    }
     return Event.findById(args.eventID)
       .then((event) => {
         if (!event) {
           throw new Error('Event not found');
         }
         const booking = new Booking({
-          user: '64ed62397d304e11b87d68db',
+          user: req.userID,
           event: event,
         });
         return booking.save();
@@ -32,7 +38,10 @@ module.exports = {
         throw err;
       });
   },
-  cancelBooking: (args) => {
+  cancelBooking: (args, req) => {
+    if (!req.isAuth) {
+      throw new Error('unauthenticated');
+    }
     return Booking.findByIdAndDelete(args.bookingID)
       .populate('event')
       .then((booking) => {

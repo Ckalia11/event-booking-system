@@ -5,12 +5,15 @@ const mongoose = require('mongoose');
 
 const resolvers = require('./graphql/resolvers/index');
 const schema = require('./graphql/schema/index');
+const isAuth = require('./middleware/auth');
 
 require('dotenv').config();
 
 const app = express();
 
 app.use(bodyParser.json());
+
+app.use(isAuth);
 
 app.use(
   '/graphql',
