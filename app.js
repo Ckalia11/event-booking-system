@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const graphqlHttp = require('express-graphql');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 const resolvers = require('./graphql/resolvers/index');
 const schema = require('./graphql/schema/index');
@@ -10,6 +11,8 @@ const isAuth = require('./middleware/auth');
 require('dotenv').config();
 
 const app = express();
+
+app.use(cors());
 
 app.use(bodyParser.json());
 
@@ -33,7 +36,7 @@ mongoose
     }
   )
   .then(() => {
-    app.listen(3000);
+    app.listen(9000);
   })
   .catch((err) => {
     console.log(err);
