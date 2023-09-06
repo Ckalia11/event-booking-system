@@ -1,7 +1,7 @@
 # Event Booking System
 
 ## About
-A project I worked on to build experience working with GraphQL APIs and server-side development in JavaScript.
+A project I worked on to build experience building GraphQL APIs and server-side development in JavaScript.
 
 ## How to use
 - Clone this repoistory
