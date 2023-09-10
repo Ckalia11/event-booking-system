@@ -1,7 +1,7 @@
 import './App.css';
-import Bookings from './pages/bookings';
-import Events from './pages/events';
-import Auth from './pages/auth';
+import BookingsPage from './pages/bookings';
+import EventsPage from './pages/events';
+import AuthPage from './pages/auth';
 import NavigationBar from './components/nav';
 import AuthContext from './context/authContext';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
@@ -34,25 +34,27 @@ function App() {
     <BrowserRouter>
       <AuthContext.Provider
         value={{
-          authInfo: authInfo,
-          login: login,
-          logout: logout,
+          authInfo,
+          login,
+          logout,
         }}
       >
         <NavigationBar />
         <Routes>
+          {authInfo.token && (
+            <Route path="/" element={<Navigate to="/events" exact />} />
+          )}
+          {authInfo.token && (
+            <Route path="/auth" element={<Navigate to="/events" exact />} />
+          )}
+          {!authInfo.token && <Route path="/auth" element={<AuthPage />} />}
+          <Route path="/events" element={<EventsPage />} />
+          {authInfo.token && (
+            <Route path="/bookings" element={<BookingsPage />} />
+          )}
           {!authInfo.token && (
-            <Route path="/" element={<Navigate to="/auth" />} />
+            <Route path="/*" element={<Navigate to="/auth" />} />
           )}
-          {!authInfo.token && <Route path="/auth" element={<Auth />} />}
-          {authInfo.token && (
-            <Route path="/" element={<Navigate to="/events" />} />
-          )}
-          {authInfo.token && (
-            <Route path="/auth" element={<Navigate to="/events" />} />
-          )}
-          <Route path="/events" element={<Events />} />
-          {authInfo.token && <Route path="/bookings" element={<Bookings />} />}
         </Routes>
       </AuthContext.Provider>
     </BrowserRouter>

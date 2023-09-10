@@ -2,11 +2,11 @@ import { useRef } from 'react';
 import { useContext } from 'react';
 import AuthContext from '../context/authContext';
 
-export default function Auth() {
+export default function AuthPage() {
   const emailEl = useRef();
   const passwordEl = useRef();
 
-  const { login, token } = useContext(AuthContext);
+  const { login } = useContext(AuthContext);
 
   const submitHandler = (e) => {
     e.preventDefault();

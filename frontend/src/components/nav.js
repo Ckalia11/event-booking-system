@@ -12,8 +12,16 @@ export default function NavigationBar() {
         <li>
           <NavLink to="/events">Events</NavLink>
         </li>
-        <li>{token && <NavLink to="bookings">Bookings</NavLink>}</li>
-        <li>{!token && <NavLink to="/auth">Auth</NavLink>}</li>
+        {token && (
+          <li>
+            <NavLink to="/bookings">Bookings</NavLink>
+          </li>
+        )}
+        {!token && (
+          <li>
+            <NavLink to="/auth">Login</NavLink>
+          </li>
+        )}
       </ul>
     </header>
   );
