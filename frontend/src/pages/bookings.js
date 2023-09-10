@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import AuthContext from '../context/authContext';
+import NavigationBar from '../components/nav';
 
 export default function BookingsPage() {
   const [bookings, setBookings] = useState([]);
@@ -43,6 +44,7 @@ export default function BookingsPage() {
 
   return (
     <React.Fragment>
+      <NavigationBar />
       <ul>{bookingsDisplay}</ul>;
     </React.Fragment>
   );

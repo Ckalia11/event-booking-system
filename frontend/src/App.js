@@ -1,8 +1,6 @@
-import './App.css';
 import BookingsPage from './pages/bookings';
 import EventsPage from './pages/events';
-import AuthPage from './pages/auth';
-import NavigationBar from './components/nav';
+import AddEventPage from './pages/addEvent';
 import AuthContext from './context/authContext';
 import SignInPage from './pages/signIn';
 import SignUpPage from './pages/signUp';
@@ -41,8 +39,10 @@ function App() {
           logout,
         }}
       >
-        {/* <NavigationBar /> */}
         <Routes>
+          {authInfo.token && (
+            <Route path="/new-event" element={<AddEventPage />} />
+          )}
           <Route path="/sign-up" element={<SignUpPage />} />
           {authInfo.token && (
             <Route path="/" element={<Navigate to="/events" exact />} />

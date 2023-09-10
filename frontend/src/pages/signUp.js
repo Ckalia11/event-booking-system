@@ -5,11 +5,12 @@ import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
+import Link from '@mui/material/Link';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import CustomLink from '../helpers/customLink';
+import { Link as LinkRouter } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
@@ -128,9 +129,9 @@ export default function SignUp() {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <CustomLink to="/sign-in">
+                <Link variant="body2" component={LinkRouter} to="/sign-in">
                   Already have an account? Sign in
-                </CustomLink>
+                </Link>
               </Grid>
             </Grid>
           </Box>

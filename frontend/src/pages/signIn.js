@@ -14,7 +14,7 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useContext } from 'react';
 import AuthContext from '../context/authContext';
-import CustomLink from '../helpers/customLink';
+import { Link as LinkRouter } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
@@ -144,9 +144,9 @@ export default function SignInSide() {
                   </Link>
                 </Grid>
                 <Grid item>
-                  <CustomLink to="/sign-up">
+                  <Link variant="body2" component={LinkRouter} to="/sign-up">
                     Don't have an account? Sign Up
-                  </CustomLink>
+                  </Link>
                 </Grid>
               </Grid>
             </Box>
