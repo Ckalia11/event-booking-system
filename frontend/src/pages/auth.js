@@ -15,14 +15,7 @@ export default function AuthPage() {
     const password = passwordEl.current.value;
 
     const uri = 'http://localhost:9000/graphql';
-    // const requestBody = {
-    //   query: `mutation {
-    //     createUser(userInput: {email: "${email}" password: "${password}"})
-    //     {
-    //       _id
-    //     }
-    //   }`,
-    // };
+
     const requestBody = {
       query: `query {
       login(email: "${email}" password: "${password}") {

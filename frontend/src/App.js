@@ -4,8 +4,8 @@ import EventsPage from './pages/events';
 import AuthPage from './pages/auth';
 import NavigationBar from './components/nav';
 import AuthContext from './context/authContext';
-import SignInPage from './components/signIn';
-import SignUpPage from './components/signUp';
+import SignInPage from './pages/signIn';
+import SignUpPage from './pages/signUp';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -43,21 +43,22 @@ function App() {
       >
         {/* <NavigationBar /> */}
         <Routes>
-          <Route path="/sign-in" element={<SignInPage />} />
           <Route path="/sign-up" element={<SignUpPage />} />
           {authInfo.token && (
             <Route path="/" element={<Navigate to="/events" exact />} />
           )}
           {authInfo.token && (
-            <Route path="/auth" element={<Navigate to="/events" exact />} />
+            <Route path="/sign-in" element={<Navigate to="/events" exact />} />
           )}
-          {!authInfo.token && <Route path="/auth" element={<AuthPage />} />}
+          {!authInfo.token && (
+            <Route path="/sign-in" element={<SignInPage />} />
+          )}
           <Route path="/events" element={<EventsPage />} />
           {authInfo.token && (
             <Route path="/bookings" element={<BookingsPage />} />
           )}
           {!authInfo.token && (
-            <Route path="/*" element={<Navigate to="/auth" />} />
+            <Route path="/*" element={<Navigate to="/sign-in" />} />
           )}
         </Routes>
       </AuthContext.Provider>

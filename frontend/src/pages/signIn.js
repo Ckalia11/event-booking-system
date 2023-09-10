@@ -12,35 +12,54 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-
-function Copyright(props) {
-  return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import { useContext } from 'react';
+import AuthContext from '../context/authContext';
+import CustomLink from '../helpers/customLink';
 
 const defaultTheme = createTheme();
 
 export default function SignInSide() {
+  const { login } = useContext(AuthContext);
+
   const handleSubmit = (event) => {
     event.preventDefault();
+
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const email = data.get('email');
+    const password = data.get('password');
+
+    const uri = 'http://localhost:9000/graphql';
+    const requestBody = {
+      query: `query {
+      login(email: "${email}" password: "${password}") {
+        token
+        userID
+        expiryHours
+      }
+    }`,
+    };
+    fetch(uri, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    })
+      .then((response) => {
+        return response.json();
+      })
+      .then((data) => {
+        if (data.data.login.token) {
+          login(
+            data.data.login.token,
+            data.data.login.userID,
+            data.data.login.tokenExpiration
+          );
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
@@ -125,12 +144,11 @@ export default function SignInSide() {
                   </Link>
                 </Grid>
                 <Grid item>
-                  <Link href="#" variant="body2">
-                    {"Don't have an account? Sign Up"}
-                  </Link>
+                  <CustomLink to="/sign-up">
+                    Don't have an account? Sign Up
+                  </CustomLink>
                 </Grid>
               </Grid>
-              <Copyright sx={{ mt: 5 }} />
             </Box>
           </Box>
         </Grid>
