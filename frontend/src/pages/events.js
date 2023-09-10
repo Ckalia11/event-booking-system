@@ -12,13 +12,23 @@ export default function EventsPage() {
   const priceEl = useRef();
   const dateEl = useRef();
 
-  useEffect(() => {
+  const getEvents = () => {
     const uri = 'http://localhost:9000/graphql';
-    const query = `{events {title}}`;
+    const requestBody = {
+      query: `query {
+      events {
+        _id
+        title
+        description
+        price
+        date
+      }
+    }`,
+    };
     fetch(uri, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: query }),
+      body: JSON.stringify(requestBody),
     })
       .then((res) => {
         return res.json();
@@ -27,7 +37,9 @@ export default function EventsPage() {
         setEvents(data.data.events);
       })
       .catch((err) => console.log(err));
-  }, []);
+  };
+
+  useEffect(getEvents, []);
 
   const eventsDisplay = events?.map((event) => (
     <li key={event._id}>
@@ -67,6 +79,7 @@ export default function EventsPage() {
       })
       .then((data) => {
         console.log(data);
+        getEvents();
       })
       .catch((err) => {
         console.log(err);
