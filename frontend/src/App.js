@@ -4,6 +4,8 @@ import EventsPage from './pages/events';
 import AuthPage from './pages/auth';
 import NavigationBar from './components/nav';
 import AuthContext from './context/authContext';
+import SignInPage from './components/signIn';
+import SignUpPage from './components/signUp';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -39,8 +41,10 @@ function App() {
           logout,
         }}
       >
-        <NavigationBar />
+        {/* <NavigationBar /> */}
         <Routes>
+          <Route path="/sign-in" element={<SignInPage />} />
+          <Route path="/sign-up" element={<SignUpPage />} />
           {authInfo.token && (
             <Route path="/" element={<Navigate to="/events" exact />} />
           )}
