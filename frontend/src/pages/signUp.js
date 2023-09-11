@@ -11,22 +11,38 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link as LinkRouter, useNavigate } from 'react-router-dom';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
 
 const defaultTheme = createTheme();
+
+const validationSchema = yup.object({
+  email: yup
+    .string('Enter your email')
+    .email('Enter a valid email')
+    .required('Email is required'),
+  password: yup
+    .string('Enter your password')
+    .min(8, 'Password should be of minimum 8 characters length')
+    .required('Password is required'),
+});
 
 export default function SignUp() {
   const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema,
+    onSubmit: (values) => {
+      const email = values.email;
+      const password = values.password;
 
-    const data = new FormData(event.currentTarget);
-    const email = data.get('email');
-    const password = data.get('password');
-
-    const uri = 'http://localhost:9000/graphql';
-    const requestBody = {
-      query: `mutation {
+      const uri = 'http://localhost:9000/graphql';
+      const requestBody = {
+        query: `mutation {
         createUser(userInput: {email: "${email}" password: "${password}"})
         {
           _id
@@ -34,25 +50,26 @@ export default function SignUp() {
           password
         }
       }`,
-    };
-    fetch(uri, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    })
-      .then((response) => {
-        return response.json();
+      };
+      fetch(uri, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
       })
-      .then((data) => {
-        console.log(data);
-        navigate('/sign-in');
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          console.log(data);
+          navigate('/sign-in');
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+  });
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -75,7 +92,7 @@ export default function SignUp() {
           <Box
             component="form"
             noValidate
-            onSubmit={handleSubmit}
+            onSubmit={formik.handleSubmit}
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
@@ -108,6 +125,11 @@ export default function SignUp() {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.email}
+                  error={formik.touched.email && Boolean(formik.errors.email)}
+                  helperText={formik.touched.email && formik.errors.email}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -119,6 +141,13 @@ export default function SignUp() {
                   type="password"
                   id="password"
                   autoComplete="new-password"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.password}
+                  error={
+                    formik.touched.password && Boolean(formik.errors.password)
+                  }
+                  helperText={formik.touched.password && formik.errors.password}
                 />
               </Grid>
             </Grid>

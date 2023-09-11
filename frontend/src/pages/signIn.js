@@ -15,52 +15,69 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useContext } from 'react';
 import AuthContext from '../context/authContext';
 import { Link as LinkRouter } from 'react-router-dom';
+import { useFormik } from 'formik';
 
 const defaultTheme = createTheme();
+
+const validate = (values) => {
+  const errors = {};
+  return errors;
+};
 
 export default function SignInSide() {
   const { login } = useContext(AuthContext);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validate,
+    onSubmit: (values) => {
+      const email = values.email;
+      const password = values.password;
 
-    const data = new FormData(event.currentTarget);
-    const email = data.get('email');
-    const password = data.get('password');
-
-    const uri = 'http://localhost:9000/graphql';
-    const requestBody = {
-      query: `query {
-      login(email: "${email}" password: "${password}") {
-        token
-        userID
-        expiryHours
-      }
-    }`,
-    };
-    fetch(uri, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    })
-      .then((response) => {
-        return response.json();
+      const uri = 'http://localhost:9000/graphql';
+      const requestBody = {
+        query: `query {
+          login(email: "${email}" password: "${password}") {
+            token
+            userID
+            expiryHours
+          }
+        }`,
+      };
+      fetch(uri, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
       })
-      .then((data) => {
-        if (data.data.login.token) {
-          login(
-            data.data.login.token,
-            data.data.login.userID,
-            data.data.login.tokenExpiration
-          );
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+        .then((response) => {
+          if (!response.ok) {
+            return response.json().then((errorData) => {
+              const errorMessage = errorData.errors[0].message;
+              formik.setErrors({ email: errorMessage });
+            });
+          } else {
+            return response.json();
+          }
+        })
+        .then((data) => {
+          if (data.data.login.token) {
+            login(
+              data.data.login.token,
+              data.data.login.userID,
+              data.data.login.tokenExpiration
+            );
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    },
+  });
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -102,7 +119,7 @@ export default function SignInSide() {
             <Box
               component="form"
               noValidate
-              onSubmit={handleSubmit}
+              onSubmit={formik.handleSubmit}
               sx={{ mt: 1 }}
             >
               <TextField
@@ -114,6 +131,11 @@ export default function SignInSide() {
                 name="email"
                 autoComplete="email"
                 autoFocus
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.email}
+                error={formik.touched.email && Boolean(formik.errors.email)}
+                helperText={formik.touched.email && formik.errors.email}
               />
               <TextField
                 margin="normal"
@@ -124,6 +146,13 @@ export default function SignInSide() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.password}
+                error={
+                  formik.touched.password && Boolean(formik.errors.password)
+                }
+                helperText={formik.touched.password && formik.errors.password}
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}

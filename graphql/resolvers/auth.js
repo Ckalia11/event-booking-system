@@ -23,7 +23,7 @@ module.exports = {
     return User.findOne({ email: email })
       .then((result) => {
         if (!result) {
-          throw new Error('User not found');
+          throw new Error('User is not found');
         }
         user = result;
         return bcrypt.compare(password, user.password);
