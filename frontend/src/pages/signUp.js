@@ -10,11 +10,13 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link as LinkRouter } from 'react-router-dom';
+import { Link as LinkRouter, useNavigate } from 'react-router-dom';
 
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+  const navigate = useNavigate();
+
   const handleSubmit = (event) => {
     event.preventDefault();
 
@@ -45,6 +47,7 @@ export default function SignUp() {
       })
       .then((data) => {
         console.log(data);
+        navigate('/sign-in');
       })
       .catch((err) => {
         console.log(err);
