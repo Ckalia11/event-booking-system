@@ -1,9 +1,4 @@
 # Event Booking System
 
 ## About
-A project I worked on to build experience building GraphQL APIs and server-side development in JavaScript.
-
-## How to use
-- Clone this repoistory
-- Run `npm install` at the project's root directory
-- Run `npm start` at the project's root directory
+This is a project I worked on mainly to build experience building GraphQL APIs and server-side development in JavaScript. This application allows you to browse and book events. 
