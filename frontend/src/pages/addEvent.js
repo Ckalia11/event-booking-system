@@ -1,16 +1,19 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, { useContext } from 'react';
 import AuthContext from '../context/authContext';
 import NavigationBar from '../components/nav';
-import { Box, TextField, Button } from '@mui/material';
+import { Box, TextField, Button, Typography } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import dayjs from 'dayjs';
+import CssBaseline from '@mui/material/CssBaseline';
+import Container from '@mui/material/Container';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useNavigate } from 'react-router-dom';
 
 const validationSchema = yup.object({
-  title: yup.string('Enter the title').required('Email is required'),
+  title: yup.string('Enter the title').required('Title is required'),
   description: yup
     .string('Enter the description')
     .required('Description is required'),
@@ -19,6 +22,8 @@ const validationSchema = yup.object({
 });
 
 export default function AddEvent() {
+  const navigate = useNavigate();
+
   const { authInfo } = useContext(AuthContext);
   const { token } = authInfo;
 
@@ -63,6 +68,7 @@ export default function AddEvent() {
         })
         .then((data) => {
           console.log(data);
+          navigate('/events');
         })
         .catch((err) => {
           console.log(err);
@@ -70,91 +76,122 @@ export default function AddEvent() {
     },
   });
 
+  const defaultTheme = createTheme();
+
   return (
     <React.Fragment>
       <NavigationBar />
-      <Box
-        component="form"
-        onSubmit={formik.handleSubmit}
-        sx={{
-          '& .MuiTextField-root': { m: 1, width: '25ch' },
-        }}
-        noValidate
-        autoComplete="off"
-      >
-        <div>
-          <TextField
-            required
-            id="title"
-            label="Title"
-            title="title"
-            autoComplete="title"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.title}
-            error={formik.touched.title && Boolean(formik.errors.title)}
-            helperText={formik.touched.title && formik.errors.title}
-          />
-        </div>
-        <div>
-          <TextField
-            required
-            id="description"
-            label="Description"
-            title="description"
-            multiline
-            rows={2}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.description}
-            error={
-              formik.touched.description && Boolean(formik.errors.description)
-            }
-            helperText={formik.touched.description && formik.errors.description}
-          />
-        </div>
-        <div>
-          <TextField
-            type="number"
-            required
-            id="price"
-            label="Price"
-            title="price"
-            onKeyDown={blockInvalidChar}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.price}
-            error={formik.touched.price && Boolean(formik.errors.price)}
-            helperText={formik.touched.price && formik.errors.price}
-          />
-        </div>
-        <div>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DatePicker
-              label="Date"
-              title="date"
-              id="date"
-              required
-              disablePast
-              onChange={(date) => formik.setFieldValue('date', date)}
-              onBlur={() => formik.setFieldTouched('date', true)}
-              value={formik.values.date}
-              slotProps={{
-                textField: {
-                  required: true,
-                  error: formik.touched.date && Boolean(formik.errors.date),
-                  helperText: formik.touched.date ? formik.errors.date : '',
-                },
-              }}
-            />
-          </LocalizationProvider>
-        </div>
-        <div>
-          <Button type="submit" variant="contained">
-            Submit
-          </Button>
-        </div>
-      </Box>
+      <ThemeProvider theme={defaultTheme}>
+        <Container component="main" maxWidth="xs">
+          <CssBaseline />
+          <Box
+            sx={{
+              marginTop: 8,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Container maxWidth="sm">
+              <Typography
+                component="h2"
+                variant="h4"
+                align="center"
+                color="text.primary"
+                gutterBottom
+              >
+                Add an event
+              </Typography>
+            </Container>
+            <Box
+              component="form"
+              onSubmit={formik.handleSubmit}
+              noValidate
+              sx={{ mt: 1 }}
+            >
+              <TextField
+                required
+                id="title"
+                label="Title"
+                title="title"
+                fullWidth
+                margin="normal"
+                autoComplete="title"
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.title}
+                error={formik.touched.title && Boolean(formik.errors.title)}
+                helperText={formik.touched.title && formik.errors.title}
+              />
+              <TextField
+                required
+                id="description"
+                label="Description"
+                title="description"
+                fullWidth
+                margin="normal"
+                multiline
+                rows={2}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.description}
+                error={
+                  formik.touched.description &&
+                  Boolean(formik.errors.description)
+                }
+                helperText={
+                  formik.touched.description && formik.errors.description
+                }
+              />
+              <TextField
+                type="number"
+                required
+                id="price"
+                label="Price"
+                title="price"
+                fullWidth
+                margin="normal"
+                onKeyDown={blockInvalidChar}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                value={formik.values.price}
+                error={formik.touched.price && Boolean(formik.errors.price)}
+                helperText={formik.touched.price && formik.errors.price}
+              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Date"
+                  title="date"
+                  id="date"
+                  fullWidth
+                  margin="normal"
+                  required
+                  disablePast
+                  onChange={(date) => formik.setFieldValue('date', date)}
+                  onBlur={() => formik.setFieldTouched('date', true)}
+                  value={formik.values.date}
+                  slotProps={{
+                    textField: {
+                      style: { marginTop: '16px', marginBottom: '8px' },
+                      required: true,
+                      error: formik.touched.date && Boolean(formik.errors.date),
+                      helperText: formik.touched.date ? formik.errors.date : '',
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Submit
+              </Button>
+            </Box>
+          </Box>
+        </Container>
+      </ThemeProvider>
     </React.Fragment>
   );
 }

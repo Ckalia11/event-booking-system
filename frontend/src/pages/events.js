@@ -12,14 +12,18 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Link from '@mui/material/Link';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import NavigationBar from '../components/nav';
 import { Link as LinkRouter } from 'react-router-dom';
+import AuthContext from '../context/authContext';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-export default function Album() {
+export default function Events() {
+  const { authInfo } = useContext(AuthContext);
+  const { token } = authInfo;
+
   const [events, setEvents] = useState([]);
 
   const getEvents = () => {
@@ -56,7 +60,6 @@ export default function Album() {
       <CssBaseline />
       <NavigationBar />
       <main>
-        {/* Hero unit */}
         <Box
           sx={{
             bgcolor: 'background.paper',
@@ -82,20 +85,22 @@ export default function Album() {
             >
               Browse popular events and book them.
             </Typography>
-            <Stack
-              sx={{ pt: 4 }}
-              direction="row"
-              spacing={2}
-              justifyContent="center"
-            >
-              <Button
-                component={LinkRouter}
-                to="/new-event"
-                variant="contained"
+            {token && (
+              <Stack
+                sx={{ pt: 4 }}
+                direction="row"
+                spacing={2}
+                justifyContent="center"
               >
-                Create Event
-              </Button>
-            </Stack>
+                <Button
+                  component={LinkRouter}
+                  to="/new-event"
+                  variant="contained"
+                >
+                  Create Event
+                </Button>
+              </Stack>
+            )}
           </Container>
         </Box>
         <Container sx={{ py: 6 }} maxWidth="md">
