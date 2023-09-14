@@ -10,17 +10,18 @@ import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useEffect, useState, useContext } from 'react';
 import NavigationBar from '../components/nav';
-import { Link as LinkRouter } from 'react-router-dom';
+import { Link as LinkRouter, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/authContext';
 
 // TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function Events() {
+  const navigate = useNavigate();
+
   const { authInfo } = useContext(AuthContext);
   const { token } = authInfo;
 
@@ -105,7 +106,7 @@ export default function Events() {
         </Box>
         <Container sx={{ py: 6 }} maxWidth="md">
           <Grid container spacing={4}>
-            {events.map((event) => (
+            {events.map((event, index) => (
               <Grid item key={event._id} xs={12} sm={6} md={4}>
                 <Card
                   sx={{
@@ -129,7 +130,16 @@ export default function Events() {
                     <Typography>{event.description}</Typography>
                   </CardContent>
                   <CardActions>
-                    <Button size="small">View</Button>
+                    <Button
+                      size="small"
+                      onClick={() => {
+                        navigate(`/events/${index + 1}`, {
+                          state: { event },
+                        });
+                      }}
+                    >
+                      View
+                    </Button>
                     {/* <Button size="small">Edit</Button> */}
                   </CardActions>
                 </Card>

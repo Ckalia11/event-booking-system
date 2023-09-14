@@ -4,6 +4,7 @@ import AddEventPage from './pages/addEvent';
 import AuthContext from './context/authContext';
 import SignInPage from './pages/signIn';
 import SignUpPage from './pages/signUp';
+import Event from './pages/event';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -40,6 +41,7 @@ function App() {
         }}
       >
         <Routes>
+          <Route path="/events/:eventId" element={<Event />} />
           {authInfo.token && (
             <Route path="/new-event" element={<AddEventPage />} />
           )}
