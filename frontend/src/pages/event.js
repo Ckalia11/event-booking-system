@@ -10,7 +10,7 @@ export default function Event() {
   const navigate = useNavigate();
 
   const { authInfo } = useContext(AuthContext);
-  const { token } = authInfo;
+  const { token, userId } = authInfo;
 
   const location = useLocation();
   const ID = location.state.event._id;
@@ -18,6 +18,7 @@ export default function Event() {
   const description = location.state.event.description;
   const price = location.state.event.price;
   const date = new Date(location.state.event.date);
+  const eventCreatorId = location.state.event.creator._id;
 
   const formattedDate = new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
@@ -51,6 +52,19 @@ export default function Event() {
       .catch((err) => console.log(err));
   };
 
+  let bookEventButton;
+  if (token) {
+    if (userId === eventCreatorId) {
+      bookEventButton = <p>You are the creator of this event.</p>;
+    } else {
+      bookEventButton = (
+        <Button onClick={bookEvent} variant="contained">
+          Book
+        </Button>
+      );
+    }
+  }
+
   return (
     <React.Fragment>
       <NavigationBar />
@@ -83,11 +97,7 @@ export default function Event() {
             <Typography>{description}</Typography>
           </Grid>
           <Grid item xs={12}>
-            {token && (
-              <Button onClick={bookEvent} variant="contained">
-                Book
-              </Button>
-            )}
+            {bookEventButton}
           </Grid>
         </Grid>
       </Paper>

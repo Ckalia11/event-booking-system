@@ -37,6 +37,9 @@ export default function Events() {
             description
             price
             date
+            creator {
+              _id
+            }
           }
         }`,
     };
