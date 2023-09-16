@@ -26,6 +26,7 @@ export default function Bookings() {
         _id
         createdAt
         event {
+          _id
           title
           date
         }

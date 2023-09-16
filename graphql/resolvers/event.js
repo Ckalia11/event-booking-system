@@ -13,6 +13,18 @@ module.exports = {
         throw err;
       });
   },
+  event: (args) => {
+    return Event.findById(args.eventID)
+      .then((event) => {
+        if (!event) {
+          throw new Error('Event not found');
+        }
+        return transformEvent(event);
+      })
+      .catch((err) => {
+        throw err;
+      });
+  },
   createEvent: (args, req) => {
     if (!req.isAuth) {
       throw new Error('unauthenticated');

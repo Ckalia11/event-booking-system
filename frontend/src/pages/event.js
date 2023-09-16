@@ -4,11 +4,48 @@ import AuthContext from '../context/authContext';
 import { useContext } from 'react';
 import NavigationBar from '../components/nav';
 import React from 'react';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import SimpleSnackbar from '../components/snackbar';
+import formatDate from '../helpers/formatDate';
 
 export default function Event() {
+  const [event, setEvent] = useState(null);
+  let { eventId } = useParams();
+  console.log(event);
+
+  const getEvent = () => {
+    const uri = 'http://localhost:9000/graphql';
+    const requestBody = {
+      query: `query {
+          event(eventID: "${eventId}") {
+            _id
+            title
+            description
+            price
+            date
+            creator {
+              _id
+            }
+          }
+        }`,
+    };
+    fetch(uri, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then((data) => {
+        setEvent(data.data.event);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(getEvent, []);
+
   const [showSnackbar, setShowSnackbar] = useState(false);
 
   const handleCloseSnackbar = (event, reason) => {
@@ -23,25 +60,11 @@ export default function Event() {
   const { authInfo } = useContext(AuthContext);
   const { token, userId } = authInfo;
 
-  const location = useLocation();
-  const ID = location.state.event._id;
-  const title = location.state.event.title;
-  const description = location.state.event.description;
-  const price = location.state.event.price;
-  const date = new Date(location.state.event.date);
-  const eventCreatorId = location.state.event.creator._id;
-
-  const formattedDate = new Intl.DateTimeFormat('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(date);
-
   const bookEvent = () => {
     const uri = 'http://localhost:9000/graphql';
     const requestBody = {
       query: `mutation {
-        bookEvent(eventID: "${ID}") {
+        bookEvent(eventID: "${event._id}") {
         _id
       }
     }`,
@@ -69,54 +92,58 @@ export default function Event() {
   };
 
   let bookEventButton;
-  if (token) {
-    if (userId === eventCreatorId) {
-      bookEventButton = <p>You are the creator of this event.</p>;
-    } else {
-      bookEventButton = (
-        <Button onClick={bookEvent} variant="contained">
-          Book
-        </Button>
-      );
+  if (event) {
+    if (token) {
+      if (userId === event.creator._id) {
+        bookEventButton = <p>You are the creator of this event.</p>;
+      } else {
+        bookEventButton = (
+          <Button onClick={bookEvent} variant="contained">
+            Book
+          </Button>
+        );
+      }
     }
   }
 
   return (
     <React.Fragment>
       <NavigationBar />
-      <Paper
-        elevation={3}
-        style={{
-          padding: 16,
-          marginTop: 30,
-          maxWidth: 600,
-          marginLeft: 'auto',
-          marginRight: 'auto',
-        }}
-      >
-        <Typography variant="h4" gutterBottom>
-          {title}
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <Typography variant="subtitle1">
-              <strong>Event Price:</strong> {price}
-            </Typography>
+      {event && (
+        <Paper
+          elevation={3}
+          style={{
+            padding: 16,
+            marginTop: 30,
+            maxWidth: 600,
+            marginLeft: 'auto',
+            marginRight: 'auto',
+          }}
+        >
+          <Typography variant="h4" gutterBottom>
+            {event.title}
+          </Typography>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1">
+                <strong>Event Price:</strong> {event.price}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1">
+                <strong>Event Date:</strong> {formatDate(event.date)}
+              </Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <Typography variant="h6">Event Description:</Typography>
+              <Typography>{event.description}</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              {bookEventButton}
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <Typography variant="subtitle1">
-              <strong>Event Date:</strong> {formattedDate}
-            </Typography>
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6">Event Description:</Typography>
-            <Typography>{description}</Typography>
-          </Grid>
-          <Grid item xs={12}>
-            {bookEventButton}
-          </Grid>
-        </Grid>
-      </Paper>
+        </Paper>
+      )}
       <SimpleSnackbar
         open={showSnackbar}
         onClose={handleCloseSnackbar}

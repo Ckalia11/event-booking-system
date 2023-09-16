@@ -136,9 +136,7 @@ export default function Events() {
                     <Button
                       size="small"
                       onClick={() => {
-                        navigate(`/events/${index + 1}`, {
-                          state: { event },
-                        });
+                        navigate(`/events/${event._id}`);
                       }}
                     >
                       View
