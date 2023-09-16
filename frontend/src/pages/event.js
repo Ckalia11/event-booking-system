@@ -4,9 +4,20 @@ import AuthContext from '../context/authContext';
 import { useContext } from 'react';
 import NavigationBar from '../components/nav';
 import React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import SimpleSnackbar from '../components/snackbar';
 
 export default function Event() {
+  const [showSnackbar, setShowSnackbar] = useState(false);
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setShowSnackbar(false);
+  };
+
   const navigate = useNavigate();
 
   const { authInfo } = useContext(AuthContext);
@@ -46,8 +57,13 @@ export default function Event() {
       .then((res) => {
         return res.json();
       })
+
       .then((data) => {
-        navigate('/bookings');
+        setShowSnackbar(true);
+        setTimeout(() => {
+          setShowSnackbar(false);
+          navigate('/bookings');
+        }, 1000);
       })
       .catch((err) => console.log(err));
   };
@@ -101,6 +117,11 @@ export default function Event() {
           </Grid>
         </Grid>
       </Paper>
+      <SimpleSnackbar
+        open={showSnackbar}
+        onClose={handleCloseSnackbar}
+        message="Event booked sucessfully"
+      />
     </React.Fragment>
   );
 }

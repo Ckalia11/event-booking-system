@@ -166,7 +166,11 @@ export default function SignUp() {
           </Box>
         </Container>
       </ThemeProvider>
-      <SimpleSnackbar open={showSnackbar} onClose={handleCloseSnackbar} />
+      <SimpleSnackbar
+        open={showSnackbar}
+        onClose={handleCloseSnackbar}
+        message="Account created! Please login."
+      />
     </React.Fragment>
   );
 }

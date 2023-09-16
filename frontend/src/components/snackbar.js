@@ -3,7 +3,7 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
-export default function SimpleSnackbar({ open, onClose }) {
+export default function SimpleSnackbar({ open, onClose, message }) {
   const action = (
     <React.Fragment>
       <IconButton
@@ -23,7 +23,7 @@ export default function SimpleSnackbar({ open, onClose }) {
         open={open}
         autoHideDuration={6000}
         onClose={onClose}
-        message="Account created! Please login."
+        message={message}
         action={action}
       />
     </div>
