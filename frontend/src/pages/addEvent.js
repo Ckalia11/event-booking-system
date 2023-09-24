@@ -12,7 +12,6 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useState } from 'react';
-import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 const validationSchema = yup.object({
   title: yup.string('Enter the title').required('Title is required'),
@@ -21,16 +20,6 @@ const validationSchema = yup.object({
     .required('Description is required'),
   price: yup.number('Enter the price').required('Price is required'),
   date: yup.date('Enter the date').required('Date is required'),
-  // image: yup
-  //   .mixed()
-  //   .test('fileSize', 'File size is too large', (value) => {
-  //     if (!value) return true;
-  //     return value.size <= 1024 * 1024;
-  //   })
-  //   .test('fileType', 'Unsupported file type', (value) => {
-  //     if (!value) return true;
-  //     return ['image/jpeg', 'image/png', 'image/gif'].includes(value.type);
-  //   }),
 });
 
 export default function AddEvent() {
@@ -99,15 +88,6 @@ export default function AddEvent() {
     e.preventDefault();
   };
 
-  const handleFileUpload = (e) => {
-    if (!e.target.files) {
-      return;
-    }
-    const file = e.target.files[0];
-    const { name } = file;
-    setFilename(name);
-  };
-
   return (
     <React.Fragment>
       <NavigationBar />
@@ -152,6 +132,7 @@ export default function AddEvent() {
                 value={formik.values.title}
                 error={formik.touched.title && Boolean(formik.errors.title)}
                 helperText={formik.touched.title && formik.errors.title}
+                inputProps={{ maxLength: 50 }}
               />
               <TextField
                 required
@@ -172,6 +153,7 @@ export default function AddEvent() {
                 helperText={
                   formik.touched.description && formik.errors.description
                 }
+                inputProps={{ maxLength: 200 }}
               />
               <TextField
                 type="number"
@@ -211,16 +193,6 @@ export default function AddEvent() {
                   }}
                 />
               </LocalizationProvider>
-              <Button
-                variant="outlined"
-                component="label"
-                startIcon={<UploadFileIcon />}
-                sx={{ mt: 2, mb: 2, mr: 2 }}
-              >
-                Upload Image
-                <input type="file" hidden onChange={handleFileUpload} />
-              </Button>
-              {filename}
               <Button
                 type="submit"
                 fullWidth

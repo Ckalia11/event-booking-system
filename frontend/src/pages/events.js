@@ -15,8 +15,9 @@ import { useEffect, useState, useContext } from 'react';
 import NavigationBar from '../components/nav';
 import { Link as LinkRouter, useNavigate } from 'react-router-dom';
 import AuthContext from '../context/authContext';
+import SimpleSnackbar from '../components/snackbar';
+import truncateString from '../helpers/truncateString';
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function Events() {
@@ -27,7 +28,19 @@ export default function Events() {
 
   const [events, setEvents] = useState([]);
 
+  const [showSnackbar, setShowSnackbar] = useState(false);
+
+  const handleCloseSnackbar = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setShowSnackbar(false);
+  };
+
   const getEvents = () => {
+    if (!token) {
+      setShowSnackbar(true);
+    }
     const uri = 'http://localhost:9000/graphql';
     const requestBody = {
       query: `query {
@@ -60,110 +73,104 @@ export default function Events() {
   useEffect(getEvents, []);
 
   return (
-    <ThemeProvider theme={defaultTheme}>
-      <CssBaseline />
-      <NavigationBar />
-      <main>
-        <Box
-          sx={{
-            bgcolor: 'background.paper',
-            pt: 8,
-            pb: 2,
-          }}
-        >
-          <Container maxWidth="sm">
-            <Typography
-              component="h1"
-              variant="h2"
-              align="center"
-              color="text.primary"
-              gutterBottom
-            >
-              Events
-            </Typography>
-            <Typography
-              variant="h5"
-              align="center"
-              color="text.secondary"
-              paragraph
-            >
-              Browse popular events and book them.
-            </Typography>
-            {token && (
-              <Stack
-                sx={{ pt: 4 }}
-                direction="row"
-                spacing={2}
-                justifyContent="center"
+    <React.Fragment>
+      <ThemeProvider theme={defaultTheme}>
+        <CssBaseline />
+        <NavigationBar />
+        <main>
+          <Box
+            sx={{
+              bgcolor: 'background.paper',
+              pt: 8,
+              pb: 2,
+            }}
+          >
+            <Container maxWidth="sm">
+              <Typography
+                component="h1"
+                variant="h2"
+                align="center"
+                color="text.primary"
+                gutterBottom
               >
-                <Button
-                  component={LinkRouter}
-                  to="/new-event"
-                  variant="contained"
+                Events
+              </Typography>
+              <Typography
+                variant="h5"
+                align="center"
+                color="text.secondary"
+                paragraph
+              >
+                Browse popular events and book them.
+              </Typography>
+              {token && (
+                <Stack
+                  sx={{ pt: 4 }}
+                  direction="row"
+                  spacing={2}
+                  justifyContent="center"
                 >
-                  Create Event
-                </Button>
-              </Stack>
-            )}
-          </Container>
-        </Box>
-        <Container sx={{ py: 6 }} maxWidth="md">
-          <Grid container spacing={4}>
-            {events.map((event, index) => (
-              <Grid item key={event._id} xs={12} sm={6} md={4}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                  }}
-                >
-                  <CardMedia
-                    component="div"
+                  <Button
+                    component={LinkRouter}
+                    to="/new-event"
+                    variant="contained"
+                  >
+                    Create Event
+                  </Button>
+                </Stack>
+              )}
+            </Container>
+          </Box>
+          <Container sx={{ py: 6 }} maxWidth="md">
+            <Grid container spacing={4}>
+              {events.map((event, index) => (
+                <Grid item key={event._id} xs={12} sm={6} md={4}>
+                  <Card
                     sx={{
-                      // 16:9
-                      pt: '56.25%',
+                      height: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
                     }}
-                    image="https://source.unsplash.com/random?wallpapers"
-                  />
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography gutterBottom variant="h5" component="h2">
-                      {event.title}
-                    </Typography>
-                    <Typography>{event.description}</Typography>
-                  </CardContent>
-                  <CardActions>
-                    <Button
-                      size="small"
-                      onClick={() => {
-                        navigate(`/events/${event._id}`);
+                  >
+                    <CardMedia
+                      component="div"
+                      sx={{
+                        // 16:9
+                        pt: '56.25%',
                       }}
-                    >
-                      View
-                    </Button>
-                    {/* <Button size="small">Edit</Button> */}
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </main>
-      {/* Footer */}
-      {/* <Box sx={{ bgcolor: 'background.paper', p: 6 }} component="footer">
-        <Typography variant="h6" align="center" gutterBottom>
-          Footer
-        </Typography>
-        <Typography
-          variant="subtitle1"
-          align="center"
-          color="text.secondary"
-          component="p"
-        >
-          Something here to give the footer a purpose!
-        </Typography>
-      </Box> */}
-      {/* End footer */}
-    </ThemeProvider>
+                      image="https://source.unsplash.com/random?wallpapers"
+                    />
+                    <CardContent sx={{ flexGrow: 1 }}>
+                      <Typography gutterBottom variant="h5" component="h2">
+                        {truncateString(event.title, 30)}
+                      </Typography>
+                      <Typography>
+                        {truncateString(event.description, 50)}
+                      </Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          navigate(`/events/${event._id}`);
+                        }}
+                      >
+                        View
+                      </Button>
+                      {/* <Button size="small">Edit</Button> */}
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          </Container>
+        </main>
+      </ThemeProvider>
+      <SimpleSnackbar
+        open={showSnackbar}
+        onClose={handleCloseSnackbar}
+        message="Sign in to create and book events"
+      />
+    </React.Fragment>
   );
 }
