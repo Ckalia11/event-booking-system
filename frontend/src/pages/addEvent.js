@@ -2,15 +2,17 @@ import React, { useContext } from 'react';
 import AuthContext from '../context/authContext';
 import NavigationBar from '../components/nav';
 import { Box, TextField, Button, Typography } from '@mui/material';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import CssBaseline from '@mui/material/CssBaseline';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { useState } from 'react';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 
 const validationSchema = yup.object({
   title: yup.string('Enter the title').required('Title is required'),
@@ -19,6 +21,16 @@ const validationSchema = yup.object({
     .required('Description is required'),
   price: yup.number('Enter the price').required('Price is required'),
   date: yup.date('Enter the date').required('Date is required'),
+  // image: yup
+  //   .mixed()
+  //   .test('fileSize', 'File size is too large', (value) => {
+  //     if (!value) return true;
+  //     return value.size <= 1024 * 1024;
+  //   })
+  //   .test('fileType', 'Unsupported file type', (value) => {
+  //     if (!value) return true;
+  //     return ['image/jpeg', 'image/png', 'image/gif'].includes(value.type);
+  //   }),
 });
 
 export default function AddEvent() {
@@ -30,6 +42,8 @@ export default function AddEvent() {
   const blockInvalidChar = (e) =>
     ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
 
+  const [filename, setFilename] = useState('');
+
   const formik = useFormik({
     initialValues: {
       title: '',
@@ -39,6 +53,9 @@ export default function AddEvent() {
     },
     validationSchema,
     onSubmit: (values) => {
+      if (!values.date || isNaN(new Date(values.date))) {
+        formik.setErrors({ date: 'Invalid date' });
+      }
       const title = values.title;
       const description = values.description;
       const price = values.price;
@@ -77,6 +94,19 @@ export default function AddEvent() {
   });
 
   const defaultTheme = createTheme();
+
+  const onKeyDown = (e) => {
+    e.preventDefault();
+  };
+
+  const handleFileUpload = (e) => {
+    if (!e.target.files) {
+      return;
+    }
+    const file = e.target.files[0];
+    const { name } = file;
+    setFilename(name);
+  };
 
   return (
     <React.Fragment>
@@ -176,10 +206,21 @@ export default function AddEvent() {
                       required: true,
                       error: formik.touched.date && Boolean(formik.errors.date),
                       helperText: formik.touched.date ? formik.errors.date : '',
+                      onKeyDown: onKeyDown,
                     },
                   }}
                 />
               </LocalizationProvider>
+              <Button
+                variant="outlined"
+                component="label"
+                startIcon={<UploadFileIcon />}
+                sx={{ mt: 2, mb: 2, mr: 2 }}
+              >
+                Upload Image
+                <input type="file" hidden onChange={handleFileUpload} />
+              </Button>
+              {filename}
               <Button
                 type="submit"
                 fullWidth
