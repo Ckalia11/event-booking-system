@@ -1,4 +1,3 @@
-import './nav.css';
 import { useContext } from 'react';
 import AuthContext from '../context/authContext';
 import AppBar from '@mui/material/AppBar';

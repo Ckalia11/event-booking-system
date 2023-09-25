@@ -27,21 +27,14 @@ export default function Events() {
   const { token } = authInfo;
 
   const [events, setEvents] = useState([]);
-
   const [showSnackbar, setShowSnackbar] = useState(false);
 
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setShowSnackbar(false);
-  };
+  const uri = 'http://localhost:9000/graphql';
 
   const getEvents = () => {
     if (!token) {
       setShowSnackbar(true);
     }
-    const uri = 'http://localhost:9000/graphql';
     const requestBody = {
       query: `query {
           events {
@@ -168,7 +161,9 @@ export default function Events() {
       </ThemeProvider>
       <SimpleSnackbar
         open={showSnackbar}
-        onClose={handleCloseSnackbar}
+        handleShowSnackbar={(val) => {
+          setShowSnackbar(val);
+        }}
         message="Sign in to create and book events"
       />
     </React.Fragment>

@@ -9,14 +9,18 @@ import formatDate from '../helpers/formatDate';
 export default function Event() {
   const [event, setEvent] = useState(null);
   const [bookings, setBookings] = useState([]);
+  const [showSnackbar, setShowSnackbar] = useState(false);
+
+  let { eventId } = useParams();
 
   const { authInfo } = useContext(AuthContext);
   const { token, userId } = authInfo;
 
-  let { eventId } = useParams();
+  const uri = 'http://localhost:9000/graphql';
+
+  const navigate = useNavigate();
 
   const getEvent = () => {
-    const uri = 'http://localhost:9000/graphql';
     let content = `event(eventID: "${eventId}") {
             _id
             title
@@ -37,14 +41,13 @@ export default function Event() {
     const query = `query {
           ${content}
         }`;
-    const requestBody = { query };
     fetch(uri, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
       },
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify({ query }),
     })
       .then((res) => {
         return res.json();
@@ -62,17 +65,6 @@ export default function Event() {
   };
 
   useEffect(getEvent, []);
-
-  const [showSnackbar, setShowSnackbar] = useState(false);
-
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setShowSnackbar(false);
-  };
-
-  const navigate = useNavigate();
 
   const bookEvent = () => {
     const uri = 'http://localhost:9000/graphql';
@@ -163,8 +155,10 @@ export default function Event() {
         </Paper>
       )}
       <SimpleSnackbar
-        open={showSnackbar}
-        onClose={handleCloseSnackbar}
+        showSnackbar={showSnackbar}
+        handleShowSnackbar={(val) => {
+          setShowSnackbar(val);
+        }}
         message="Event booked sucessfully"
       />
     </React.Fragment>

@@ -34,13 +34,6 @@ export default function SignUp() {
 
   const [showSnackbar, setShowSnackbar] = useState(false);
 
-  const handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setShowSnackbar(false);
-  };
-
   const formik = useFormik({
     initialValues: {
       email: '',
@@ -72,7 +65,7 @@ export default function SignUp() {
         .then((response) => {
           return response.json();
         })
-        .then((data) => {
+        .then((_) => {
           setShowSnackbar(true);
           setTimeout(() => {
             setShowSnackbar(false);
@@ -168,7 +161,9 @@ export default function SignUp() {
       </ThemeProvider>
       <SimpleSnackbar
         open={showSnackbar}
-        onClose={handleCloseSnackbar}
+        handleShowSnackbar={(val) => {
+          setShowSnackbar(val);
+        }}
         message="Account created! Please login."
       />
     </React.Fragment>

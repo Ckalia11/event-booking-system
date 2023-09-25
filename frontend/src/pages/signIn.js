@@ -10,36 +10,30 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import AuthContext from '../context/authContext';
 import { Link as LinkRouter } from 'react-router-dom';
 import { useFormik } from 'formik';
-import { useState } from 'react';
 import SimpleAlert from '../components/alert';
 
 const defaultTheme = createTheme();
-
-const validate = (values) => {
-  const errors = {};
-  return errors;
-};
 
 export default function SignInSide() {
   const { login } = useContext(AuthContext);
 
   const [showAlert, setShowAlert] = useState(false);
 
+  const uri = 'http://localhost:9000/graphql';
+
   const formik = useFormik({
     initialValues: {
       email: '',
       password: '',
     },
-    validate,
     onSubmit: (values) => {
       const email = values.email;
       const password = values.password;
 
-      const uri = 'http://localhost:9000/graphql';
       const requestBody = {
         query: `query {
           login(email: "${email}" password: "${password}") {
@@ -58,7 +52,7 @@ export default function SignInSide() {
       })
         .then((response) => {
           if (!response.ok) {
-            return response.json().then((errorData) => {
+            return response.json().then((_) => {
               setShowAlert(true);
             });
           } else {
@@ -120,6 +114,13 @@ export default function SignInSide() {
                 message="User not found. Please check your credentials."
               />
             )}
+            <Typography variant="body2" align="center" sx={{ mt: 2, mb: 2 }}>
+              Welcome to eventing! Click{' '}
+              <Link component={LinkRouter} to="/events">
+                here
+              </Link>{' '}
+              to browse popular events or sign in to create and book events.
+            </Typography>
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
               <LockOutlinedIcon />
             </Avatar>

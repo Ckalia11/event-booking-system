@@ -11,7 +11,6 @@ import { useNavigate } from 'react-router-dom';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { useState } from 'react';
 
 const validationSchema = yup.object({
   title: yup.string('Enter the title').required('Title is required'),
@@ -22,16 +21,14 @@ const validationSchema = yup.object({
   date: yup.date('Enter the date').required('Date is required'),
 });
 
+const blockInvalidChar = (e) =>
+  ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
+
 export default function AddEvent() {
   const navigate = useNavigate();
 
   const { authInfo } = useContext(AuthContext);
   const { token } = authInfo;
-
-  const blockInvalidChar = (e) =>
-    ['e', 'E', '+', '-'].includes(e.key) && e.preventDefault();
-
-  const [filename, setFilename] = useState('');
 
   const formik = useFormik({
     initialValues: {
@@ -42,9 +39,6 @@ export default function AddEvent() {
     },
     validationSchema,
     onSubmit: (values) => {
-      if (!values.date || isNaN(new Date(values.date))) {
-        formik.setErrors({ date: 'Invalid date' });
-      }
       const title = values.title;
       const description = values.description;
       const price = values.price;
@@ -84,7 +78,7 @@ export default function AddEvent() {
 
   const defaultTheme = createTheme();
 
-  const onKeyDown = (e) => {
+  const handleManualDatePickerEntry = (e) => {
     e.preventDefault();
   };
 
@@ -188,7 +182,7 @@ export default function AddEvent() {
                       required: true,
                       error: formik.touched.date && Boolean(formik.errors.date),
                       helperText: formik.touched.date ? formik.errors.date : '',
-                      onKeyDown: onKeyDown,
+                      onKeyDown: handleManualDatePickerEntry,
                     },
                   }}
                 />

@@ -5,11 +5,19 @@ import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import NavigationBar from '../components/nav';
-import Orders from '../components/table';
 import { useState, useEffect, useContext } from 'react';
 import AuthContext from '../context/authContext';
+import Link from '@mui/material/Link';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import { Button } from '@mui/material';
+import Title from '../components/title';
+import formatDate from '../helpers/formatDate';
+import { Link as LinkRouter } from 'react-router-dom';
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function Bookings() {
@@ -18,8 +26,9 @@ export default function Bookings() {
   const { authInfo } = useContext(AuthContext);
   const { token } = authInfo;
 
+  const uri = 'http://localhost:9000/graphql';
+
   const getBookings = () => {
-    const uri = 'http://localhost:9000/graphql';
     const requestBody = {
       query: `query {
       bookings {
@@ -52,8 +61,7 @@ export default function Bookings() {
 
   useEffect(getBookings, []);
 
-  const handleCancel = (bookingID) => {
-    const uri = 'http://localhost:9000/graphql';
+  const handleCancelBooking = (bookingID) => {
     const requestBody = {
       query: `mutation {
         cancelBooking(bookingID: "${bookingID}") {
@@ -72,7 +80,7 @@ export default function Bookings() {
       .then((res) => {
         return res.json();
       })
-      .then((data) => {
+      .then((_) => {
         getBookings();
       })
       .catch((err) => console.log(err));
@@ -98,7 +106,42 @@ export default function Bookings() {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-                  <Orders bookings={bookings} handleCancel={handleCancel} />
+                  <Title>Bookings</Title>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Event Name</TableCell>
+                        <TableCell>Event Date</TableCell>
+                        <TableCell>Booking Date</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {bookings.map((booking) => (
+                        <TableRow key={booking._id}>
+                          <TableCell>
+                            <Link
+                              component={LinkRouter}
+                              to={'/events/' + booking.event._id}
+                            >
+                              {booking.event.title}
+                            </Link>
+                          </TableCell>
+                          <TableCell>
+                            {formatDate(booking.event.date)}
+                          </TableCell>
+                          <TableCell>{formatDate(booking.createdAt)}</TableCell>
+                          <TableCell>
+                            <Button
+                              size="small"
+                              onClick={() => handleCancelBooking(booking._id)}
+                            >
+                              Cancel Booking
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </Paper>
               </Grid>
             </Grid>
